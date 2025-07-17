@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.impute import SimpleImputer
 
 def data_pipeline(file_name):
-    ufc = pd.read_csv(f'../data/{file_name}')
+    ufc = pd.read_csv(f'data/{file_name}')
 
     red_names = ufc['RedFighter']
     blue_names = ufc['BlueFighter']

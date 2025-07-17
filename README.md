@@ -185,17 +185,6 @@ The prediction system:
 4. Test thoroughly
 5. Submit a pull request
 
-## 📝 License
-
-This project is for educational and demonstration purposes.
-
-## 🙏 Acknowledgments
-
-- UFC for providing fight data
-- Scikit-learn for ML algorithms
-- Plotly for interactive visualizations
-- Font Awesome for icons
-
 ---
 
 **Note**: This is a demonstration project. Fight predictions should not be used for gambling purposes. 
