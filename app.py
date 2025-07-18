@@ -1,8 +1,6 @@
 from flask import Flask, render_template, jsonify
 import pandas as pd
 import joblib
-import sys
-import os
 from pipeline import data_pipeline
 
 app = Flask(__name__)
