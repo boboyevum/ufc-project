@@ -7,7 +7,6 @@ from pipeline import data_pipeline
 
 app = Flask(__name__)
 
-# Load the trained model
 model = joblib.load('models/mlp_model.pkl')
 
 @app.route('/')
@@ -17,17 +16,13 @@ def index():
 @app.route('/api/predictions')
 def get_predictions():
     try:
-        # Load and process upcoming fights data
         df_upcoming, red_corner, blue_corner = data_pipeline('upcoming.csv')
         
-        # Make predictions
         predictions = model.predict(df_upcoming)
-        probabilities = model.predict_proba(df_upcoming)[:, 1]  # Red corner win probability
+        probabilities = model.predict_proba(df_upcoming)[:, 1]
         
-        # Create predictions list
         fight_predictions = []
         for i, (red, blue, pred, prob) in enumerate(zip(red_corner, blue_corner, predictions, probabilities)):
-            # Get weight class from original data
             upcoming_data = pd.read_csv('data/upcoming.csv')
             weight_class = upcoming_data.iloc[i]['WeightClass'] if i < len(upcoming_data) else 'Unknown'
             
@@ -37,7 +32,7 @@ def get_predictions():
                 'prediction': 'Red' if pred == 1 else 'Blue',
                 'confidence': float(prob if pred == 1 else 1 - prob),
                 'weightClass': weight_class,
-                'actualResult': 'TBD'  # Since these are upcoming fights
+                'actualResult': 'TBD'
             })
         
         return jsonify({
@@ -55,35 +50,26 @@ def get_predictions():
 @app.route('/api/stats')
 def get_stats():
     try:
-        # Load main dataset for statistics
         ufc_data = pd.read_csv('data/ufc-master.csv')
         
-        # Calculate basic statistics
         total_fights = int(len(ufc_data))
         unique_fighters = int(len(set(ufc_data['RedFighter'].tolist() + ufc_data['BlueFighter'].tolist())))
         
-        # Winner distribution
         winner_counts = ufc_data['Winner'].value_counts()
         red_wins = int(winner_counts.get('Red', 0))
         blue_wins = int(winner_counts.get('Blue', 0))
         
-        # Weight class distribution
         weight_class_counts = ufc_data['WeightClass'].value_counts().head(8)
         
-        # Finish types
         finish_counts = ufc_data['Finish'].value_counts().head(8)
         
-        # Gender distribution
         gender_counts = ufc_data['Gender'].value_counts()
         
-        # Title bout analysis
         title_bout_counts = ufc_data['TitleBout'].value_counts()
         
-        # Stance analysis
         red_stance_counts = ufc_data['RedStance'].value_counts().head(3)
         blue_stance_counts = ufc_data['BlueStance'].value_counts().head(3)
         
-        # Age analysis (if available)
         age_data = {}
         if 'RedAge' in ufc_data.columns and 'BlueAge' in ufc_data.columns:
             red_ages = ufc_data['RedAge'].dropna()
@@ -95,7 +81,6 @@ def get_stats():
                 'blueAgeRange': [float(blue_ages.min()), float(blue_ages.max())]
             }
         
-        # Win streak analysis
         win_streak_data = {}
         if 'RedCurrentWinStreak' in ufc_data.columns and 'BlueCurrentWinStreak' in ufc_data.columns:
             red_streaks = ufc_data['RedCurrentWinStreak'].dropna()
@@ -110,20 +95,17 @@ def get_stats():
                     'blueMaxStreak': int(blue_max) if blue_max is not None else 0
                 }
         
-        # Enhanced statistics for complex visualizations
         
-        # 1. Fight duration analysis (simplified)
         duration_data = {
             'avgDuration': 8.5,
             'minDuration': 0.1,
             'maxDuration': 25.0,
             'histogram': {
-                'bins': list(range(0, 26, 2)),  # 0-25 minutes in 2-minute bins
+                'bins': list(range(0, 26, 2)),
                 'counts': [800, 1200, 1000, 800, 600, 400, 300, 200, 150, 100, 80, 60, 40]
             }
         }
         
-        # 2. Weight class vs finish type correlation (simplified)
         weight_finish_data = {
             'weightClasses': ['Lightweight', 'Welterweight', 'Middleweight', 'Light Heavyweight', 'Heavyweight'],
             'finishTypes': ['U-DEC', 'KO/TKO', 'SUB', 'S-DEC', 'M-DEC'],
@@ -136,7 +118,6 @@ def get_stats():
             ]
         }
         
-        # 3. Fighter performance trends (simplified)
         performance_data = {
             'avgRedWins': 8.5,
             'avgBlueWins': 8.3,
@@ -146,7 +127,6 @@ def get_stats():
             }
         }
         
-        # 4. Win rate by weight class (simplified)
         win_rate_data = {
             'Lightweight': {'redWinRate': 0.52, 'blueWinRate': 0.48, 'totalFights': 800},
             'Welterweight': {'redWinRate': 0.48, 'blueWinRate': 0.52, 'totalFights': 750},
